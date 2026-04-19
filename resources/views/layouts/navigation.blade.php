@@ -16,13 +16,13 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
                 </div>
-                @if(auth()->user()->role === 'user' ) 
+                {{-- @if(auth()->user()->role === 'user' ) 
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                         <x-nav-link :href="route('projects.create')" :active="request()->routeIs('projects.create')">
                             {{ __('Project') }}
                         </x-nav-link>
                     </div>
-                @endif
+                @endif --}}
             </div>
 
             <!-- Settings Dropdown -->

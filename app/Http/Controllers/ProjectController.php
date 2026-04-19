@@ -7,7 +7,6 @@ use App\Models\Approval;
 use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use App\Constants\Constants;
 use Mail;
 use App\Mail\ProjectStatusMail;
@@ -41,7 +40,7 @@ class ProjectController extends Controller
         Mail::to($project->user->email)
             ->queue(new ProjectStatusMail($project, 'Submitted'));
 
-        return redirect()->back()->with('success', 'Project submitted.');
+        return redirect()->route('dashboard')->with('success', 'Project submitted.');
     }
 
     public function approve (Request $request, $id, Project $project) {
@@ -103,7 +102,7 @@ class ProjectController extends Controller
             DB::commit();
             return redirect()->back()->with('success','Selected projects approved successfully.');
            
-        } catch(\Excetion $e) {
+        } catch(\Exception $e) {
             DB::rollback();
             return redirect()->back()->withErrors('Bulk approval failed.');
         }
