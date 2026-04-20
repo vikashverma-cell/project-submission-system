@@ -52,6 +52,14 @@ class ProjectController extends Controller
         // use policy
         $this->authorize('approve', $project); 
 
+        if ($project->status == Constants::PROJECT_STATUS['approved']) {
+            return back()->with('error', 'Project already approved.');
+        }
+
+        if ($project->status == Constants::PROJECT_STATUS['rejected']) {
+            return back()->with('error', 'Rejected project cannot be approved.');
+        }
+
         //call stored procedure
         DB::select("CALL sp_approve_project(?,?)",[$id,auth()->id()]);
 
@@ -67,6 +75,13 @@ class ProjectController extends Controller
             return redirect()->back()->with('error', 'Record not found.');
         }
         $this->authorize('approve', $project);
+        if ($project->status == Constants::PROJECT_STATUS['approved']) {
+            return back()->with('error', 'Approved project cannot be rejected.');
+        }
+
+        if ($project->status == Constants::PROJECT_STATUS['rejected']) {
+            return back()->with('error', 'Project already rejected.');
+        }
         $project->update([
             'status' => Constants::PROJECT_STATUS['rejected']
         ]);
