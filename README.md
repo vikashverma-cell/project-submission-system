@@ -31,3 +31,7 @@ php artisan serve
 Stored Procedure
 Run SQL:
 sp_approve_project()
+
+
+
+project workflow demo link: https://www.loom.com/share/dff5c707edc740b5a1f04763aee46a36

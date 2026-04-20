@@ -113,7 +113,14 @@ class ProjectController extends Controller
         try{
             foreach($request->ids as $projectId){
                 DB::select("CALL sp_approve_project(?,?)",[$projectId ,auth()->id()]);
+
+                 $project = \App\Models\Project::with('user')->find($projectId);
+                if ($project && $project->user) {
+                    Mail::to($project->user->email)
+                        ->queue(new \App\Mail\ProjectStatusMail($project, 'Approved'));
+                }
             }
+            
             DB::commit();
             return redirect()->back()->with('success','Selected projects approved successfully.');
            
@@ -136,7 +143,11 @@ class ProjectController extends Controller
         try{
             foreach($request->ids as $projectId)
             {
-                Project::where('id', $projectId)->update(['status' => Constants::PROJECT_STATUS['rejected']]);
+                $project = Project::with('user')->find($projectId);
+                if (!$project) {
+                    return redirect()->back()->withErrors('Record not found.');
+                } 
+                $project->where('id', $projectId)->update(['status' => Constants::PROJECT_STATUS['rejected']]);
 
                 Approval::create([
                     'project_id'=>$projectId,
@@ -150,6 +161,11 @@ class ProjectController extends Controller
                     'user_id'=>auth()->id(),
                     'action'=>'bulk rejected'
                 ]);
+
+                if ($project->user && $project->user->email) {
+                    Mail::to($project->user->email)
+                        ->queue(new \App\Mail\ProjectStatusMail($project, 'Rejected', $request->reason));
+                }
             }
             DB::commit();
             return redirect()->back()->with('success','Selected projects rejected.');
